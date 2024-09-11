@@ -60,16 +60,16 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
     strm = ax.streamplot(X, Y, U, V, color='b', linewidth=1, density=2)
     
     for (x, y), carga in zip(posiciones_cargas, cargas):
-        ax.scatter(x, y, color='r' if carga > 0 else 'g', s=100, edgecolor='k')
+        ax.scatter(x, y, color='r' if carga > 0 else 'g', s=100, edgecolor='k', zorder=2)
     
     ax.set_title('Líneas de Campo Eléctrico')
     ax.set_xlabel('X (m)')
     ax.set_ylabel('Y (m)')
     ax.set_xlim(rango_x)
     ax.set_ylim(rango_y)
-    ax.set_aspect('equal', 'box')
+    ax.set_aspect('equal', 'box') #Esto fuerza proporciones iguales para x e y
     ax.grid(True)
-    plt.colorbar(strm.lines, ax=ax, label='Magnitud del Campo Eléctrico')
+    #plt.colorbar(strm.lines, ax=ax, label='Magnitud del Campo Eléctrico')
     
     plt.show()
 
@@ -97,8 +97,8 @@ def obtener_datos():
         campo_total = calcular_campo_electrico(cargas, posiciones_cargas, punto)
         
         # Mostrar el campo total en la interfaz
-        label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n{campo_total[0]:.3e} N/C en X\n{campo_total[1]:.3e} N/C en Y")
-        
+        label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n({campo_total[0]:.3e} î + {campo_total[1]:.3e} ĵ) N/C")
+
         # Graficar las líneas de campo eléctrico
         graficar_lineas_campo(cargas, posiciones_cargas)
     
