@@ -32,15 +32,13 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
     x_min, y_min = np.min(posiciones_array, axis=0)
     x_max, y_max = np.max(posiciones_array, axis=0)
     
-    # Asegurar que el gráfico sea cuadrado
     rango_max = max(x_max - x_min, y_max - y_min)
-    margen = rango_max * 0.2  # Margen del 20%
+    margen = rango_max * 0.2
 
     if rango_max == 0:  # Si todas las cargas están en el mismo punto
         margen = 1.0
         rango_max = 1.0
 
-    # Definir los rangos para que formen un cuadrado
     rango_x = (x_min - margen, x_min + rango_max + margen)
     rango_y = (y_min - margen, y_min + rango_max + margen)
     
@@ -69,7 +67,7 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
     ax.set_ylabel('Y (m)')
     ax.set_xlim(rango_x)
     ax.set_ylim(rango_y)
-    ax.set_aspect('equal', 'box')  # Forzar proporciones iguales para X e Y
+    ax.set_aspect('equal', 'box')
     ax.grid(True)
     plt.colorbar(strm.lines, ax=ax, label='Magnitud del Campo Eléctrico')
     
@@ -91,6 +89,17 @@ def obtener_datos():
             x, y = map(float, entries_posiciones[i].get().split())
             posiciones_cargas.append((x, y))
         
+        # Obtener el punto donde se quiere calcular el campo
+        punto_x, punto_y = map(float, entry_punto.get().split())
+        punto = (punto_x, punto_y)
+
+        # Calcular el campo eléctrico total en el punto dado
+        campo_total = calcular_campo_electrico(cargas, posiciones_cargas, punto)
+        
+        # Mostrar el campo total en la interfaz
+        label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n{campo_total[0]:.3e} N/C en X\n{campo_total[1]:.3e} N/C en Y")
+        
+        # Graficar las líneas de campo eléctrico
         graficar_lineas_campo(cargas, posiciones_cargas)
     
     except ValueError:
@@ -132,7 +141,7 @@ def crear_interfaz():
     """
     Crea la interfaz gráfica para solicitar datos al usuario.
     """
-    global entry_num_cargas, entries_cargas, entries_posiciones, frame_cargas
+    global entry_num_cargas, entries_cargas, entries_posiciones, entry_punto, label_resultado, frame_cargas
     
     root = Tk()
     root.title("Datos para Cálculo del Campo Eléctrico")
@@ -141,16 +150,24 @@ def crear_interfaz():
     entry_num_cargas = Entry(root)
     entry_num_cargas.grid(row=0, column=1, padx=10, pady=10)
     
-    Button(root, text="Generar Campos", command=crear_campos).grid(row=0, column=2, padx=10, pady=10)
+    Button(root, text="Cargar Valores", command=crear_campos).grid(row=0, column=2, padx=10, pady=10)
     
     Label(root, text="Cargas (en Coulombs):").grid(row=1, column=0, padx=10, pady=10)
-    Label(root, text="Posiciones (x y):").grid(row=2, column=0, padx=10, pady=10)
+    
     
     frame_cargas = Frame(root)
     frame_cargas.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
     
-    Button(root, text="Calcular y Graficar", command=obtener_datos).grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+    Label(root, text="Punto (x y):").grid(row=3, column=0, padx=10, pady=10)
+    entry_punto = Entry(root)
+    entry_punto.grid(row=3, column=1, padx=10, pady=10)
     
+    Button(root, text="Calcular y Graficar", command=obtener_datos).grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+
+    # Etiqueta para mostrar el resultado del campo eléctrico
+    label_resultado = Label(root, text="",font=('Arial', 20), fg= '#0000FF')
+    label_resultado.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
+
     root.mainloop()
 
 # Ejecutar la interfaz gráfica
