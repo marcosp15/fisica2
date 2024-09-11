@@ -97,7 +97,7 @@ def obtener_datos():
         campo_total = calcular_campo_electrico(cargas, posiciones_cargas, punto)
         
         # Mostrar el campo total en la interfaz
-        label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n({campo_total[0]:.3e} î + {campo_total[1]:.3e} ĵ) N/C")
+        label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n({campo_total[0]:.3e} î + {campo_total[1]:.3e} ĵ) N/C", font=("Helvatica",14), fg="black")
 
         # Graficar las líneas de campo eléctrico
         graficar_lineas_campo(cargas, posiciones_cargas)
