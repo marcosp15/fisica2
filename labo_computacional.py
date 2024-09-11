@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tkinter import Frame, Tk, Label, Entry, Button, messagebox, Toplevel
-import matplotlib.backends.backend_tkagg as tkagg
+from tkinter import Frame, Tk, Label, Entry, Button, messagebox
 
 # Constante de Coulomb
 k_e = 8.99e9  # N m^2 / C^2
@@ -27,11 +26,26 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
     """
     Genera y muestra un gráfico de las líneas de campo eléctrico para las cargas dadas.
     """
-    tamaño_rejilla = 0.1
-    rango = (-5, 5)
+    tamaño_rejilla = 0.05
     
-    x = np.arange(rango[0], rango[1], tamaño_rejilla)
-    y = np.arange(rango[0], rango[1], tamaño_rejilla)
+    posiciones_array = np.array(posiciones_cargas)
+    x_min, y_min = np.min(posiciones_array, axis=0)
+    x_max, y_max = np.max(posiciones_array, axis=0)
+    
+    # Asegurar que el gráfico sea cuadrado
+    rango_max = max(x_max - x_min, y_max - y_min)
+    margen = rango_max * 0.2  # Margen del 20%
+
+    if rango_max == 0:  # Si todas las cargas están en el mismo punto
+        margen = 1.0
+        rango_max = 1.0
+
+    # Definir los rangos para que formen un cuadrado
+    rango_x = (x_min - margen, x_min + rango_max + margen)
+    rango_y = (y_min - margen, y_min + rango_max + margen)
+    
+    x = np.arange(rango_x[0], rango_x[1], tamaño_rejilla)
+    y = np.arange(rango_y[0], rango_y[1], tamaño_rejilla)
     X, Y = np.meshgrid(x, y)
     
     U = np.zeros(X.shape)
@@ -44,7 +58,7 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
             U[i, j] = E[0]
             V[i, j] = E[1]
     
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(8, 8))  # Forzar que el gráfico sea un cuadrado
     strm = ax.streamplot(X, Y, U, V, color='b', linewidth=1, density=2)
     
     for (x, y), carga in zip(posiciones_cargas, cargas):
@@ -53,10 +67,11 @@ def graficar_lineas_campo(cargas, posiciones_cargas):
     ax.set_title('Líneas de Campo Eléctrico')
     ax.set_xlabel('X (m)')
     ax.set_ylabel('Y (m)')
-    ax.set_xlim(rango)
-    ax.set_ylim(rango)
+    ax.set_xlim(rango_x)
+    ax.set_ylim(rango_y)
+    ax.set_aspect('equal', 'box')  # Forzar proporciones iguales para X e Y
     ax.grid(True)
-    plt.colorbar(strm.lines, ax=ax, label='Cargar valores')
+    plt.colorbar(strm.lines, ax=ax, label='Magnitud del Campo Eléctrico')
     
     plt.show()
 
@@ -88,7 +103,10 @@ def crear_campos():
     try:
         num_cargas = int(entry_num_cargas.get())
         
-        # Limpiar campos previos
+        if num_cargas < 3:
+            messagebox.showerror("Número de Cargas Inválido", "Debe ingresar al menos 3 cargas.")
+            return
+        
         for widget in frame_cargas.winfo_children():
             widget.destroy()
         
@@ -114,7 +132,7 @@ def crear_interfaz():
     """
     Crea la interfaz gráfica para solicitar datos al usuario.
     """
-    global entry_num_cargas, entries_cargas, entries_posiciones, entry_punto, frame_cargas
+    global entry_num_cargas, entries_cargas, entries_posiciones, frame_cargas
     
     root = Tk()
     root.title("Datos para Cálculo del Campo Eléctrico")
@@ -130,10 +148,6 @@ def crear_interfaz():
     
     frame_cargas = Frame(root)
     frame_cargas.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
-    
-    Label(root, text="Punto (x y):").grid(row=3, column=0, padx=10, pady=10)
-    entry_punto = Entry(root)
-    entry_punto.grid(row=3, column=1, padx=10, pady=10)
     
     Button(root, text="Calcular y Graficar", command=obtener_datos).grid(row=4, column=0, columnspan=2, padx=10, pady=10)
     
