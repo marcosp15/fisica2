@@ -164,7 +164,7 @@ def obtener_datos():
         label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n({campo_total[0]:.3e} î + {campo_total[1]:.3e} ĵ) N/C", font=("Helvatica",14), fg="black")
 
         # Graficar las líneas de campo eléctrico
-       # graficar_lineas_campo(cargas, posiciones_cargas)
+        graficar_lineas_campo(cargas, posiciones_cargas)
 
         #Graficar el potencial eléctrico
         graficar_potencial_electrico(cargas, posiciones_cargas)
