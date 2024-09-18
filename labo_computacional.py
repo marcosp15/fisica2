@@ -98,9 +98,9 @@ def graficar_campo_y_potencial(cargas, posiciones_cargas):
     for (x, y), carga in zip(posiciones_cargas, cargas):
         ax.scatter(x, y, color='r' if carga > 0 else 'b', s=100, edgecolor='k', zorder=2)
     
-    ax.set_title('Líneas de Campo Eléctrico y Potencial Eléctrico (Escala Logarítmica)')
-    ax.set_xlabel('X (m)')
-    ax.set_ylabel('Y (m)')
+    ax.set_title('Líneas de Campo Eléctrico y Potencial Eléctrico ')
+    ax.set_xlabel('X ')
+    ax.set_ylabel('Y ')
     ax.set_xlim(rango_x)
     ax.set_ylim(rango_y)
     ax.set_aspect('equal', 'box')  # Esto fuerza proporciones iguales para x e y
