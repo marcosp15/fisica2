@@ -5,9 +5,9 @@ from tkinter import Frame, Tk, Label, Entry, Button, messagebox
 # Constante de Coulomb
 k_e = 8.99e9  # N m^2 / C^2
 
-def calcular_campo_electrico(cargas, posiciones_cargas, punto):
+def calcular_campo(cargas, posiciones_cargas, punto):
     """
-    Calcula el campo eléctrico resultante en un punto dado debido a varias cargas puntuales.
+    Campo eléctrico resultante en un punto dado debido a varias cargas puntuales.
     """
     campo_total = np.array([0.0, 0.0])
     punto = np.array(punto)
@@ -22,9 +22,9 @@ def calcular_campo_electrico(cargas, posiciones_cargas, punto):
     
     return campo_total
 
-def potencial_electrico(cargas, posicion_cargas, punto):
+def calcular_potencial(cargas, posicion_cargas, punto):
     """
-    Calcula el potencial electrico desde un punto dadas las cargas electricas y sus posiciones
+    Potencial electrico desde un punto dadas las cargas electricas y sus posiciones
     """
     pot_elec = 0.0
     punto = np.array(punto)
@@ -40,7 +40,7 @@ def potencial_electrico(cargas, posicion_cargas, punto):
 
 def graficar_campo_y_potencial(cargas, posiciones_cargas):
     """
-    Genera y muestra un gráfico combinado de las líneas de campo eléctrico
+    Gráfico combinado de las líneas de campo eléctrico
     y el potencial eléctrico para las cargas dadas, aplicando una transformación
     logarítmica al potencial para mejorar la visibilidad de los detalles.
     """
@@ -69,30 +69,32 @@ def graficar_campo_y_potencial(cargas, posiciones_cargas):
     V = np.zeros(Y.shape)
     pot = np.zeros(X.shape)
 
-    # Calcular el campo eléctrico y el potencial en cada punto de la rejilla
+    # Calculo del campo eléctrico y el potencial en cada punto de la rejilla
     for i in range(X.shape[0]):
         for j in range(Y.shape[1]):
             punto = (X[i, j], Y[i, j])
-            E = calcular_campo_electrico(cargas, posiciones_cargas, punto)
+            E = calcular_campo(cargas, posiciones_cargas, punto)
             U[i, j] = E[0]
             V[i, j] = E[1]
-            pot[i, j] = potencial_electrico(cargas, posiciones_cargas, punto)
+            pot[i, j] = calcular_potencial(cargas, posiciones_cargas, punto)
 
-    # Aplicar una transformación logarítmica al potencial eléctrico
+    # Aplicamos una transformación logarítmica al potencial eléctrico para mejorar detalles
     pot_transformado = np.log(np.abs(pot) + 1e-9)
 
-    # Definir los niveles para el contorno basados en el rango del potencial transformado
+    # Define los niveles para el contorno basados en el rango del potencial transformado
     pot_min, pot_max = np.min(pot_transformado), np.max(pot_transformado)
     niveles = np.linspace(pot_min, pot_max, 100)
     
-    # Graficar las líneas de campo y el potencial eléctrico transformado
+    # Grafico de las líneas de campo y el potencial eléctrico transformado
     fig, ax = plt.subplots(figsize=(8, 8))  # Forzar que el gráfico sea un cuadrado
-    # Contorno del potencial eléctrico
-    strm_pot = ax.contourf(X, Y, pot_transformado, levels=niveles, cmap='RdYlBu', alpha=0.75)
-    # Líneas de campo eléctrico
-    strm_campo = ax.streamplot(X, Y, U, V, color='k', linewidth=0.5, density=2)  # Aumentar densidad
 
-    # Dibujar las cargas
+    # Contorno del potencial eléctrico
+    strm_pot = ax.contour(X, Y, pot_transformado, levels=niveles, cmap='RdYlBu', alpha=0.75)
+
+    # Líneas de campo eléctrico
+    strm_campo = ax.streamplot(X, Y, U, V, color='k', linewidth=0.1, density=2)  # Aumentar densidad
+
+    # Dibujo de las cargas
     for (x, y), carga in zip(posiciones_cargas, cargas):
         ax.scatter(x, y, color='r' if carga > 0 else 'b', s=100, edgecolor='k', zorder=2)
     
@@ -103,8 +105,8 @@ def graficar_campo_y_potencial(cargas, posiciones_cargas):
     ax.set_ylim(rango_y)
     ax.set_aspect('equal', 'box')  # Esto fuerza proporciones iguales para x e y
 
-    # Barra de color para el potencial eléctrico
-    plt.colorbar(strm_pot, ax=ax, label='Logaritmo del Potencial Eléctrico')
+   
+
     
     plt.show()
 
@@ -128,17 +130,17 @@ def obtener_datos():
             x, y = map(float, entries_posiciones[i].get().split())
             posiciones_cargas.append((x, y))
         
-        # Obtener el punto donde se quiere calcular el campo
+        # Obtiene el punto donde se quiere calcular el campo
         punto_x, punto_y = map(float, entry_punto.get().split())
         punto = (punto_x, punto_y)
 
-        # Calcular el campo eléctrico total en el punto dado
-        campo_total = calcular_campo_electrico(cargas, posiciones_cargas, punto)
+        # Calcula el campo eléctrico total en el punto dado
+        campo_total = calcular_campo(cargas, posiciones_cargas, punto)
         
-        # Mostrar el campo total en la interfaz
+        # Muestra el campo total en la interfaz
         label_resultado.config(text=f"Campo Eléctrico Total en ({punto_x}, {punto_y}):\n({campo_total[0]:.3e} î + {campo_total[1]:.3e} ĵ) N/C", font=("Helvatica",14), fg="black")
 
-        # Graficar las líneas de campo eléctrico y el potencial eléctrico
+        # Grafico de las líneas de campo eléctrico y el potencial eléctrico
         graficar_campo_y_potencial(cargas, posiciones_cargas)
         
     
@@ -147,7 +149,7 @@ def obtener_datos():
 
 def crear_campos():
     """
-    Crea los campos para ingresar las cargas y posiciones, basado en el número de cargas.
+    Campos para ingresar las cargas y posiciones, basado en el número de cargas.
     """
     try:
         num_cargas = int(entry_num_cargas.get())
@@ -179,7 +181,7 @@ def crear_campos():
 
 def crear_interfaz():
     """
-    Crea la interfaz gráfica para solicitar datos al usuario.
+    Interfaz gráfica para solicitar datos al usuario.
     """
     global entry_num_cargas, entries_cargas, entries_posiciones, entry_punto, label_resultado, frame_cargas
     
@@ -204,11 +206,11 @@ def crear_interfaz():
     
     Button(root, text="Calcular y Graficar", command=obtener_datos).grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
-    # Etiqueta para mostrar el resultado del campo eléctrico
-    label_resultado = Label(root, text="",font=('Arial', 20), fg= '#0000FF')
+    
+    label_resultado = Label(root, text="",font=('Arial', 20), fg= '#0000FF') # resultado del campo eléctrico
     label_resultado.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
 
     root.mainloop()
 
-# Ejecutar la interfaz gráfica
+
 crear_interfaz()
