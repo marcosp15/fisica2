@@ -104,10 +104,7 @@ def graficar_campo_y_potencial(cargas, posiciones_cargas):
     ax.set_xlim(rango_x)
     ax.set_ylim(rango_y)
     ax.set_aspect('equal', 'box')  # Esto fuerza proporciones iguales para x e y
-
-   
-
-    
+ 
     plt.show()
 
 
@@ -143,7 +140,6 @@ def obtener_datos():
         # Grafico de las líneas de campo eléctrico y el potencial eléctrico
         graficar_campo_y_potencial(cargas, posiciones_cargas)
         
-    
     except ValueError:
         messagebox.showerror("Entrada Inválida", "Por favor, ingrese valores válidos.")
 
