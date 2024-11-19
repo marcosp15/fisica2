@@ -12,8 +12,19 @@ def campo_alambre(I, L, P):
     if r == 0:
         return np.array([0, 0, 0])
     
-    B_x = mu0 * I / (2 * np.pi * r) * (L / (np.sqrt(r**2 + (L/2)**2)))
-    return np.array([B_x, 0, 0])
+    # Ángulos en los extremos del alambre
+    theta1 = np.arctan2(-L/2 - z, r)
+    theta2 = np.arctan2(L/2 - z, r)
+    
+    # Magnitud del campo magnético
+    B_magnitude = (mu0 * I / (4 * np.pi * r)) * (np.sin(theta2) - np.sin(theta1))
+    
+    # Campo magnético en coordenadas cartesianas
+    B_x = -B_magnitude * y / r  # Componente en x
+    B_y = B_magnitude * x / r   # Componente en y
+    B_z = 0                     # Componente en z (circularidad)
+    
+    return np.array([B_x, B_y, B_z])
 
 def campo_espira(I, a, P):
     """Calcula el campo magnético de una espira circular en un punto P."""
